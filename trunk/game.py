@@ -9,7 +9,7 @@ class Player():
         self.frame = 0
         self.health = 10
         #self.images = [pygame.image.load("picture.png")]
-        playerImage = pygame.Surface((50,50))
+        playerImage = pygame.Surface((32,32))
         playerImage.fill((255,0,0))
         self.images = [playerImage]
     def update(self):
@@ -28,7 +28,7 @@ class Enemy():
         self.yVelocity = 0
         self.frame = 0
         #self.images = [pygame.image.load("picture.png")]
-        playerImage = pygame.Surface((50,50))
+        playerImage = pygame.Surface((32,32))
         playerImage.fill((105,0,0))
         self.images = [playerImage]
         self.path = path
@@ -56,6 +56,140 @@ class Enemy():
                 self.pathIndex = 0
     def draw(self,screen):
         screen.blit(self.images[self.frame],(self.x,self.y))
+    def drawFOV(self,screen,tiles):
+        center = [self.x+16,self.y+16]
+        #pygame.draw.polygon(screen,(255,255,255),[center,[center[0]+45,center[1]-45],[center[0]+45,center[1]+45]])
+        surf = pygame.Surface((200,200))
+        x = int(float(self.x)/32+0.5)
+        y = int(float(self.y)/32+0.5)
+        size = 60
+        width = 30
+        dir = 0
+        if (self.xVelocity>0):
+            dir = 0
+        elif (self.yVelocity<0):
+            dir = 1
+        elif (self.xVelocity<0):
+            dir = 2
+        elif (self.yVelocity>0):
+            dir = 3
+        if (dir == 0):
+            pygame.draw.polygon(surf,(255,255,255),[[size,size],[size+size,size-width],[size+size,size+width]])
+            points = self.getShadow(0,1,2,center,x+1,y+1,tiles,size,surf)
+            points = self.getShadow(0,1,2,center,x+2,y+1,tiles,size,surf)
+            points = self.getShadow(0,2,2,center,x+1,y,tiles,size,surf)
+            points = self.getShadow(0,2,2,center,x+2,y,tiles,size,surf)
+            points = self.getShadow(0,2,1,center,x+1,y-1,tiles,size,surf)
+            points = self.getShadow(0,2,1,center,x+2,y-1,tiles,size,surf)
+        elif (dir == 1):
+            pygame.draw.polygon(surf,(255,255,255),[[size,size],[size-width,0],[size+width,0]])
+            points = self.getShadow(1,1,2,center,x+1,y-1,tiles,size,surf)
+            points = self.getShadow(1,1,2,center,x+1,y-2,tiles,size,surf)
+            points = self.getShadow(1,2,2,center,x,y-1,tiles,size,surf)
+            points = self.getShadow(1,2,2,center,x,y-2,tiles,size,surf)
+            points = self.getShadow(1,2,1,center,x-1,y-1,tiles,size,surf)
+            points = self.getShadow(1,2,1,center,x-1,y-2,tiles,size,surf)
+        elif (dir == 2):
+            pygame.draw.polygon(surf,(255,255,255),[[size,size],[0,size-width],[0,size+width]])
+            points = self.getShadow(2,1,2,center,x-1,y+1,tiles,size,surf)
+            points = self.getShadow(2,1,2,center,x-2,y+1,tiles,size,surf)
+            points = self.getShadow(2,2,2,center,x-1,y,tiles,size,surf)
+            points = self.getShadow(2,2,2,center,x-2,y,tiles,size,surf)
+            points = self.getShadow(2,2,1,center,x-1,y-1,tiles,size,surf)
+            points = self.getShadow(2,2,1,center,x-2,y-1,tiles,size,surf)
+        elif (dir == 3):
+            pygame.draw.polygon(surf,(255,255,255),[[size,size],[size-width,size+size],[size+width,size+size]])
+            points = self.getShadow(3,1,2,center,x+1,y+1,tiles,size,surf)
+            points = self.getShadow(3,1,2,center,x+1,y+2,tiles,size,surf)
+            points = self.getShadow(3,2,2,center,x,y+1,tiles,size,surf)
+            points = self.getShadow(3,2,2,center,x,y+2,tiles,size,surf)
+            points = self.getShadow(3,2,1,center,x-1,y+1,tiles,size,surf)
+            points = self.getShadow(3,2,1,center,x-1,y+2,tiles,size,surf)
+            
+        surf.set_colorkey((0,0,0))
+        surf.set_alpha(100)
+        screen.blit(surf,(center[0]-60,center[1]-60))
+
+    def getLineIntersect(pointA,line):
+        center[0]
+        
+    def getShadow(self,dir,a,b,center,x,y,tiles,size,surf):
+        if (x > len(tiles[0]) or y > len(tiles) or checkCollidable(tiles[y][x])==0 or x*32 == center[0] or y*32 == center[1]):
+            return 0
+        x = x*32-center[0]
+        y = y*32-center[1]
+
+        if (dir==0):
+            if (a==1):
+                p1 = [x,y]
+                p4 = [size,y]
+            elif (a==2):
+                p1 = [x,y]
+                p4 = [size,size*(y)/(x)]
+
+            if (b==1):
+                p2 = [x,y+32]
+                p3 = [size,y+32]
+            elif (b==2):
+                p2 = [x,y+32]
+                p3 = [size,size*(y+32)/(x)]
+
+        elif (dir==2):
+            if (a==1):
+                p1 = [x+32,y]
+                p4 = [-size,y]
+            elif (a==2):
+                p1 = [x,y]
+                p4 = [-size,-size*(y)/(x)]
+
+            if (b==1):
+                p2 = [x+32,y+32]
+                p3 = [-size,y+32]
+            elif (b==2):
+                p2 = [x+32,y+32]
+                p3 = [-size,-size*(y+32)/(x)]
+
+        elif (dir==1):
+            if (a==1):
+                p1 = [x,y+32]
+                p4 = [x,-size]
+            elif (a==2):
+                p1 = [x,y+32]
+                p4 = [-size*(x)/(y+32),-size]
+
+            if (b==1):
+                p2 = [x+32,y+32]
+                p3 = [x+32,-size]
+            elif (b==2):
+                p2 = [x+32,y+32]
+                p3 = [-size*(x+32)/(y+32),-size]
+
+        elif (dir==3):
+            if (a==1):
+                p1 = [x,y]
+                p4 = [x,size]
+            elif (a==2):
+                p1 = [x,y]
+                p4 = [size*(x)/(y),size]
+
+            if (b==1):
+                p2 = [x+32,y]
+                p3 = [x+32,size]
+            elif (b==2):
+                p2 = [x+32,y]
+                p3 = [size*(x+32)/(y),size]                
+
+        #alter points
+        p1[0]+=size
+        p1[1]+=size
+        p2[0]+=size
+        p2[1]+=size
+        p3[0]+=size
+        p3[1]+=size
+        p4[0]+=size
+        p4[1]+=size
+        pygame.draw.polygon(surf,(0,0,0),[p1,p2,p3,p4])
+        return 1
         
 class Controls():
     def __init__(self):
@@ -100,6 +234,8 @@ class Camera():
 class Game():
     def __init__(self):
         pygame.init()
+        self.menu = pygame.Surface((640,480))
+        self.menu.fill((255,255,255))
         self.clock = pygame.time.Clock()
         self.controls = Controls()
         self.screen = pygame.display.set_mode((640,480))
@@ -123,7 +259,7 @@ class Game():
                           [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]]
             self.player = Player(1,3)
             self.enemies = []
-            self.enemies.append(Enemy([[2,0],[8,0]]))
+            self.enemies.append(Enemy([[1,0],[8,0]]))
             self.cameras = [Camera(pygame.Rect(0,0,32*5,32*5),0,0),Camera(pygame.Rect(32*5,0,32*5,32*5),32*5,0),
                             Camera(pygame.Rect(32*10,0,32*5,32*5),32*10,0),Camera(pygame.Rect(32*15,0,32*5,32*5),32*15,0),
                             Camera(pygame.Rect(0,32*5,32*5,32*5),0,32*5),Camera(pygame.Rect(32*5,32*5,32*5,32*5),32*5,32*5),
@@ -170,6 +306,16 @@ class Game():
                 worldLoc[0] = c.view.x + (loc[0] - c.x)
                 worldLoc[1] = c.view.y + (loc[1] - c.y)
         return worldLoc[0], worldLoc[1]
+
+    def playMenu(self):
+        while 1:
+            self.clock.tick(30)
+            self.screen.blit(self.menu,(0,0))
+            if (self.controls.update()==1):
+                return -1
+            if self.controls.A==1:
+                return 1
+            pygame.display.flip()
 
     def play(self):
         while 1:
@@ -259,6 +405,7 @@ class Game():
             self.player.draw(self.world)
             for e in self.enemies:
                 e.draw(self.world)
+                e.drawFOV(self.world,self.tiles)
             
             #draw
             for c in self.cameras:
@@ -290,7 +437,10 @@ while 1:
     num = game.play()
     print num
     if (num==-1):
-        break
+        if (game.playMenu()==-1):
+            break
+        else:
+            game.restart(0)
     elif (num==0):
         game.restart(currentLevel)
     elif (num==1):

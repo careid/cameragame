@@ -70,8 +70,8 @@ class Enemy():
         self.pathIndex = 0
         self.range = 3
         self.playerView = 0
-        self.viewWidth = 50
-        self.viewLength = 100
+        self.viewWidth = 30
+        self.viewLength = 75
         self.action = "walk"
         self.images = [[pygame.image.load("graphics\\enemy1right.png")],
                        [pygame.image.load("graphics\\enemy1back.png")],
@@ -408,9 +408,9 @@ class Game():
         worldLoc = [-1000,-1000]
         cam = None
         for c in self.cameras:
-            if (checkContain(loc,pygame.Rect(c.x,c.y,c.view.width,c.view.height))==1):
-                worldLoc[0] = c.view.x + (loc[0] - c.x)
-                worldLoc[1] = c.view.y + (loc[1] - c.y)
+            if (checkContain(loc,pygame.Rect(c.x,c.y,c.view.width*c.scale,c.view.height*c.scale))==1):
+                worldLoc[0] = c.view.x + float(loc[0] - c.x)/c.scale
+                worldLoc[1] = c.view.y + float(loc[1] - c.y)/c.scale
                 cam = c
         return cam,worldLoc[0], worldLoc[1]
 

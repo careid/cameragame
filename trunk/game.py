@@ -73,13 +73,15 @@ class Enemy():
         self.viewWidth = 30
         self.viewLength = 75
         self.action = "walk"
-        self.images = [[pygame.image.load("graphics\\enemy1right.png")],
-                       [pygame.image.load("graphics\\enemy1back.png")],
-                       [pygame.image.load("graphics\\enemy1left.png")],
-                       [pygame.image.load("graphics\\enemy1front.png")]]
+        #self.images = [[pygame.image.load("graphics\\enemy1right.png")],
+        #               [pygame.image.load("graphics\\enemy1back.png")],
+        #               [pygame.image.load("graphics\\enemy1left.png")],
+        #               [pygame.image.load("graphics\\enemy1front.png")]]
+        self.images = [[pygame.image.load("graphics\\enemy0.png"),pygame.image.load("graphics\\enemy1.png"),pygame.image.load("graphics\\enemy2.png"),pygame.image.load("graphics\\enemy3.png")],
+                       [pygame.image.load("graphics\\enemy0.png"),pygame.image.load("graphics\\enemy1.png"),pygame.image.load("graphics\\enemy2.png"),pygame.image.load("graphics\\enemy3.png")],
+                       [pygame.image.load("graphics\\enemy0.png"),pygame.image.load("graphics\\enemy1.png"),pygame.image.load("graphics\\enemy2.png"),pygame.image.load("graphics\\enemy3.png")],
+                       [pygame.image.load("graphics\\enemy0.png"),pygame.image.load("graphics\\enemy1.png"),pygame.image.load("graphics\\enemy2.png"),pygame.image.load("graphics\\enemy3.png")]]
         self.dir = 0
-        pygame.mixer.music.load("The start.mp3")
-        pygame.mixer.music.play(-1)
     def update(self):
         tempIndex = self.pathIndex+1
         if (tempIndex>=len(self.path)):
@@ -118,7 +120,7 @@ class Enemy():
                 self.frame = 0
         elif (self.action == "walk"):
             self.frame += 0.3
-            if self.frame > 0:
+            if self.frame > 3:
                 self.frame = 0
     def play(self,action):
         if (self.action == action):
@@ -337,6 +339,8 @@ class Game():
         while(os.path.exists("graphics\\tile"+str(i)+".png")):
             self.tileImages.append(pygame.image.load("graphics\\tile"+str(i)+".png"))
             i+=1
+        pygame.mixer.music.load("The start.mp3")
+        pygame.mixer.music.play(-1)
         #self.tileImages = [greenTile,blueTile]
 
     def restart(self,level):

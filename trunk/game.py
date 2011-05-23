@@ -1,4 +1,5 @@
 import pygame
+import os
 
 class Player():
     def __init__(self,x,y):
@@ -61,6 +62,8 @@ class Enemy():
     def draw(self,screen):
         screen.blit(self.images[self.frame],(self.x,self.y))
     def drawFOV(self,screen,tiles):
+        if (self.x < 0):
+            return None
         center = [self.x+16,self.y+16]
         #pygame.draw.polygon(screen,(255,255,255),[center,[center[0]+45,center[1]-45],[center[0]+45,center[1]+45]])
         surf = pygame.Surface((self.viewLength*2,self.viewLength*2))
@@ -247,27 +250,29 @@ class Game():
         greenTile.fill((0,255,0))
         blueTile.fill((0,0,255))
         self.tileSize = 32
-        self.tileImages = [greenTile,blueTile]
+        i = 0
+        self.tileImages = []
+        while(os.path.exists("graphics\\tile"+str(i)+".png")):
+            self.tileImages.append(pygame.image.load("graphics\\tile"+str(i)+".png"))
+        #self.tileImages = [greenTile,blueTile]
 
     def restart(self,level):
         if level == 0:
-            self.tiles = [[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-                          [0,1,1,0,0,0,0,0,0,0,0,0,1,1,1,1,0],
-                          [0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
-                          [0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
-                          [0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
-                          [0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
-                          [0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
-                          [0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
-                          [0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
-                          [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]]
+            self.tiles = [[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                          [0,1,1,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,0],
+                          [0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
+                          [0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
+                          [0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
+                          [0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
+                          [0,1,1,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,0],
+                          [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]]
             self.player = Player(1,5)
             self.enemies = []
             self.enemies.append(Enemy([[1,2],[8,2]]))
-            self.cameras = [Camera(pygame.Rect(0,0,32*5,32*5),0,0),Camera(pygame.Rect(32*5,0,32*5,32*5),32*6,0),
-                            Camera(pygame.Rect(32*10,0,32*5,32*5),32*12,0),Camera(pygame.Rect(32*15,0,32*5,32*5),32*18,0),
-                            Camera(pygame.Rect(0,32*5,32*5,32*5),0,32*6),Camera(pygame.Rect(32*5,32*5,32*5,32*5),32*6,32*6),
-                            Camera(pygame.Rect(32*10,32*5,32*5,32*5),32*12,32*6),Camera(pygame.Rect(32*15,32*5,32*5,32*5),32*18,32*6)]
+            self.cameras = [Camera(pygame.Rect(0,0,32*5,32*5),0,0),Camera(pygame.Rect(32*5,0,32*5,32*5),32*5+50,0),
+                            Camera(pygame.Rect(32*10,0,32*5,32*5),32*10+50,0),Camera(pygame.Rect(32*15,0,32*5,32*5),32*15+50,0),
+                            Camera(pygame.Rect(0,32*5,32*5,32*5),0,32*5+50),Camera(pygame.Rect(32*5,32*5,32*5,32*5),32*5+50,32*5+50),
+                            Camera(pygame.Rect(32*10,32*5,32*5,32*5),32*10+50,32*5+50),Camera(pygame.Rect(32*15,32*5,32*5,32*5),32*15+50,32*5+50)]
         elif level == 1:
             self.tiles = [[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
                           [1,1,1,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1],
@@ -304,12 +309,14 @@ class Game():
             self.cameras = [Camera(pygame.Rect(0,0,32*5,32*5),210,0),Camera(pygame.Rect(32*5,0,32*5,32*5),0,0),Camera(pygame.Rect(0,32*5,32*5,32*5),0,210),Camera(pygame.Rect(32*5,32*5,32*5,32*5),210,210)]
 
     def fromCameraToWorld(self,loc):
-        worldLoc = [-100,-100]
+        worldLoc = [-1000,-1000]
+        cam = None
         for c in self.cameras:
             if (checkContain(loc,pygame.Rect(c.x,c.y,c.view.width,c.view.height))==1):
                 worldLoc[0] = c.view.x + (loc[0] - c.x)
                 worldLoc[1] = c.view.y + (loc[1] - c.y)
-        return worldLoc[0], worldLoc[1]
+                cam = c
+        return cam,worldLoc[0], worldLoc[1]
 
     def playMenu(self):
         while 1:
@@ -352,15 +359,14 @@ class Game():
                     playerCamera = c
             for e in self.enemies:
                 e.update()
-                e.x,e.y = self.fromCameraToWorld([e.superX,e.superY])
+                c,e.x,e.y = self.fromCameraToWorld([e.superX,e.superY])
                 inRange = 0
                 e.playerView = 0
-                for c in self.cameras:
-                    if (checkContain([e.x,e.y],c.view)==1):
-                        c.active = 1
-                        if (c == playerCamera):
-                            inRange = 1
-                            e.playerView = 1
+                if (c):
+                    c.active = 1
+                    if (c == playerCamera):
+                        inRange = 1
+                        e.playerView = 1
                 
             
             for y in range(len(self.tiles)):

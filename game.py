@@ -11,6 +11,7 @@ class Player():
         #self.images = [pygame.image.load("picture.png")]
         playerImage = pygame.Surface((32,32))
         playerImage.fill((255,0,0))
+        playerImage.set_colorkey((0,0,0))
         self.images = [playerImage]
     def update(self):
         self.x += self.xVelocity
@@ -18,7 +19,7 @@ class Player():
     def draw(self,screen):
         screen.blit(self.images[self.frame],(self.x,self.y))
 
-class Enemy():        
+class Enemy():
     def __init__(self,path):
         self.x = 0
         self.y = 0
@@ -34,6 +35,9 @@ class Enemy():
         self.path = path
         self.pathIndex = 0
         self.range = 3
+        self.playerView = 0
+        self.viewWidth = 50
+        self.viewLength = 100
     def update(self):
         tempIndex = self.pathIndex+1
         if (tempIndex>=len(self.path)):
@@ -59,11 +63,11 @@ class Enemy():
     def drawFOV(self,screen,tiles):
         center = [self.x+16,self.y+16]
         #pygame.draw.polygon(screen,(255,255,255),[center,[center[0]+45,center[1]-45],[center[0]+45,center[1]+45]])
-        surf = pygame.Surface((200,200))
+        surf = pygame.Surface((self.viewLength*2,self.viewLength*2))
         x = int(float(self.x)/32+0.5)
         y = int(float(self.y)/32+0.5)
-        size = 60
-        width = 30
+        size = self.viewLength
+        width = self.viewWidth
         dir = 0
         if (self.xVelocity>0):
             dir = 0
@@ -108,10 +112,8 @@ class Enemy():
             
         surf.set_colorkey((0,0,0))
         surf.set_alpha(100)
-        screen.blit(surf,(center[0]-60,center[1]-60))
-
-    def getLineIntersect(pointA,line):
-        center[0]
+        screen.blit(surf,(center[0]-self.viewLength,center[1]-self.viewLength))
+        return pygame.mask.from_surface(surf,50)
         
     def getShadow(self,dir,a,b,center,x,y,tiles,size,surf):
         if (x > len(tiles[0]) or y > len(tiles) or checkCollidable(tiles[y][x])==0 or x*32 == center[0] or y*32 == center[1]):
@@ -139,7 +141,7 @@ class Enemy():
                 p1 = [x+32,y]
                 p4 = [-size,y]
             elif (a==2):
-                p1 = [x,y]
+                p1 = [x+32,y]
                 p4 = [-size,-size*(y)/(x)]
 
             if (b==1):
@@ -257,9 +259,9 @@ class Game():
                           [0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
                           [0,1,1,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,0],
                           [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]]
-            self.player = Player(1,3)
+            self.player = Player(1,5)
             self.enemies = []
-            self.enemies.append(Enemy([[1,0],[8,0]]))
+            self.enemies.append(Enemy([[1,2],[8,2]]))
             self.cameras = [Camera(pygame.Rect(0,0,32*5,32*5),0,0),Camera(pygame.Rect(32*5,0,32*5,32*5),32*5,0),
                             Camera(pygame.Rect(32*10,0,32*5,32*5),32*10,0),Camera(pygame.Rect(32*15,0,32*5,32*5),32*15,0),
                             Camera(pygame.Rect(0,32*5,32*5,32*5),0,32*5),Camera(pygame.Rect(32*5,32*5,32*5,32*5),32*5,32*5),
@@ -350,50 +352,14 @@ class Game():
                 e.update()
                 e.x,e.y = self.fromCameraToWorld([e.superX,e.superY])
                 inRange = 0
+                e.playerView = 0
                 for c in self.cameras:
                     if (checkContain([e.x,e.y],c.view)==1):
                         c.active = 1
                         if (c == playerCamera):
                             inRange = 1
-                if (inRange):
-                    oriX = int(float(e.x)/32+0.5)
-                    oriY = int(float(e.y)/32+0.5)
-                    #check up
-                    x = oriX
-                    y = oriY
-                    r = e.range
-                    while(r > 0 and x >= 0 and y >= 0 and x < len(self.tiles[0]) and y < len(self.tiles) and checkCollidable(self.tiles[y][x])==0):
-                        y -= 1
-                        r -=1
-                        if (int(float(self.player.x)/32+0.5) == x and int(float(self.player.y)/32+0.5) == y):
-                            self.player.health -= 1
-                    #check down
-                    x = oriX
-                    y = oriY+1
-                    r = e.range
-                    while(r > 0 and x >= 0 and y >= 0 and x < len(self.tiles[0]) and y < len(self.tiles) and checkCollidable(self.tiles[y][x])==0):
-                        y += 1
-                        r -= 1
-                        if (int(float(self.player.x)/32+0.5) == x and int(float(self.player.y)/32+0.5) == y):
-                            self.player.health -= 1
-                    #check left
-                    x = oriX-1
-                    y = oriY
-                    r = e.range
-                    while(r > 0 and x >= 0 and y >= 0 and x < len(self.tiles[0]) and y < len(self.tiles) and checkCollidable(self.tiles[y][x])==0):
-                        x -= 1
-                        r -= 1
-                        if (int(float(self.player.x)/32+0.5) == x and int(float(self.player.y)/32+0.5) == y):
-                            self.player.health -= 1
-                    #check right
-                    x = oriX+1
-                    y = oriY
-                    r = e.range
-                    while(r > 0 and x >= 0 and y >= 0 and x < len(self.tiles[0]) and y < len(self.tiles) and checkCollidable(self.tiles[y][x])==0):
-                        x += 1
-                        r -= 1
-                        if (int(float(self.player.x)/32+0.5) == x and int(float(self.player.y)/32+0.5) == y):
-                            self.player.health -= 1
+                            e.playerView = 1
+                
             
             for y in range(len(self.tiles)):
                 for x in range(len(self.tiles[y])):
@@ -405,7 +371,14 @@ class Game():
             self.player.draw(self.world)
             for e in self.enemies:
                 e.draw(self.world)
-                e.drawFOV(self.world,self.tiles)
+                mask = e.drawFOV(self.world,self.tiles)
+                if e.playerView==1:
+                    img = pygame.Surface((32,32))
+                    img.fill((255,255,255))
+                    img.set_colorkey((0,0,0))
+                    playerMask = pygame.mask.from_surface(img,50)
+                    if not (mask.overlap(playerMask,[self.player.x-(e.x+16-e.viewLength),self.player.y-(e.y+16-e.viewLength)])==None):
+                        self.player.health -= 1
             
             #draw
             for c in self.cameras:

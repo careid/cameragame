@@ -13,12 +13,45 @@ class Player():
         playerImage = pygame.Surface((32,32))
         playerImage.fill((255,0,0))
         playerImage.set_colorkey((0,0,0))
-        self.images = [playerImage]
+        self.action = "walk"
+        self.images = [[pygame.image.load("graphics\\frontwalk1.png"),pygame.image.load("graphics\\frontwalk2.png"),pygame.image.load("graphics\\frontwalk3.png"),pygame.image.load("graphics\\frontwalk4.png")],
+                       [pygame.image.load("graphics\\frontwalk1.png"),pygame.image.load("graphics\\frontwalk2.png"),pygame.image.load("graphics\\frontwalk3.png"),pygame.image.load("graphics\\frontwalk4.png")],
+                       [pygame.image.load("graphics\\frontwalk1.png"),pygame.image.load("graphics\\frontwalk2.png"),pygame.image.load("graphics\\frontwalk3.png"),pygame.image.load("graphics\\frontwalk4.png")],
+                       [pygame.image.load("graphics\\frontwalk1.png"),pygame.image.load("graphics\\frontwalk2.png"),pygame.image.load("graphics\\frontwalk3.png"),pygame.image.load("graphics\\frontwalk4.png")]]
+        self.dir = 0
     def update(self):
         self.x += self.xVelocity
         self.y += self.yVelocity
+        if (self.xVelocity>0):
+            self.dir = 0
+        elif (self.xVelocity<0):
+            self.dir = 2
+        elif (self.yVelocity <0):
+            self.dir = 1
+        elif (self.yVelocity > 0):
+            self.dir = 3
+        if (self.xVelocity != 0 or self.yVelocity !=0):
+            self.play("walk")
+        else:
+            self.play("idle")
+        if (self.action == "idle"):
+            self.frame += 0.3
+            if self.frame > 0:
+                self.frame = 0
+        elif (self.action == "walk"):
+            self.frame += 0.3
+            if self.frame > 3:
+                self.frame = 0
+    def play(self,action):
+        if (self.action == action):
+            return
+        self.action = action
+        if (self.action == "idle"):
+            self.frame = 0
+        elif (self.action == "walk"):
+            self.frame = 0
     def draw(self,screen):
-        screen.blit(self.images[self.frame],(self.x,self.y))
+        screen.blit(self.images[self.dir][int(self.frame)],(self.x,self.y))
 
 class Enemy():
     def __init__(self,path):
@@ -39,6 +72,12 @@ class Enemy():
         self.playerView = 0
         self.viewWidth = 50
         self.viewLength = 100
+        self.action = "walk"
+        self.images = [[pygame.image.load("graphics\\enemy1right.png")],
+                       [pygame.image.load("graphics\\enemy1back.png")],
+                       [pygame.image.load("graphics\\enemy1left.png")],
+                       [pygame.image.load("graphics\\enemy1front.png")]]
+        self.dir = 0
     def update(self):
         tempIndex = self.pathIndex+1
         if (tempIndex>=len(self.path)):
@@ -59,8 +98,36 @@ class Enemy():
             self.pathIndex += 1
             if (self.pathIndex>=len(self.path)):
                 self.pathIndex = 0
+        if (self.xVelocity>0):
+            self.dir = 0
+        elif (self.xVelocity<0):
+            self.dir = 2
+        elif (self.yVelocity <0):
+            self.dir = 1
+        elif (self.yVelocity > 0):
+            self.dir = 3
+        if (self.xVelocity != 0 or self.yVelocity !=0):
+            self.play("walk")
+        else:
+            self.play("idle")
+        if (self.action == "idle"):
+            self.frame += 0.3
+            if self.frame > 0:
+                self.frame = 0
+        elif (self.action == "walk"):
+            self.frame += 0.3
+            if self.frame > 0:
+                self.frame = 0
+    def play(self,action):
+        if (self.action == action):
+            return
+        self.action = action
+        if (self.action == "idle"):
+            self.frame = 0
+        elif (self.action == "walk"):
+            self.frame = 0
     def draw(self,screen):
-        screen.blit(self.images[self.frame],(self.x,self.y))
+        screen.blit(self.images[self.dir][int(self.frame)],(self.x,self.y))
     def drawFOV(self,screen,tiles):
         if (self.x < 0):
             return None

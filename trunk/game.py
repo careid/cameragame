@@ -254,6 +254,7 @@ class Game():
         self.tileImages = []
         while(os.path.exists("graphics\\tile"+str(i)+".png")):
             self.tileImages.append(pygame.image.load("graphics\\tile"+str(i)+".png"))
+            i+=1
         #self.tileImages = [greenTile,blueTile]
 
     def restart(self,level):

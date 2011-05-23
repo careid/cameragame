@@ -272,6 +272,7 @@ class Game():
             self.player = Player(1,5)
             self.enemies = []
             self.enemies.append(Enemy([[1,2],[8,2]]))
+            self.enemies.append(Enemy([[13,2],[13,8]]))
             self.cameras = [Camera(pygame.Rect(0,0,32*5,32*5),0,0),Camera(pygame.Rect(32*5,0,32*5,32*5),32*6,0),
                             Camera(pygame.Rect(32*10,0,32*5,32*5),32*12,0),Camera(pygame.Rect(32*15,0,32*5,32*5),32*18,0),
                             Camera(pygame.Rect(0,32*5,32*5,32*5),0,32*6),Camera(pygame.Rect(32*5,32*5,32*5,32*5),32*6,32*6),

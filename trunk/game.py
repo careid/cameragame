@@ -151,34 +151,46 @@ class Enemy():
             pygame.draw.polygon(surf,(255,255,255),[[size,size],[size+size,size-width],[size+size,size+width]])
             points = self.getShadow(0,1,2,center,x+1,y+1,tiles,size,surf)
             points = self.getShadow(0,1,2,center,x+2,y+1,tiles,size,surf)
+            points = self.getShadow(0,1,2,center,x+3,y+1,tiles,size,surf)
             points = self.getShadow(0,2,2,center,x+1,y,tiles,size,surf)
             points = self.getShadow(0,2,2,center,x+2,y,tiles,size,surf)
+            points = self.getShadow(0,2,2,center,x+3,y,tiles,size,surf)
             points = self.getShadow(0,2,1,center,x+1,y-1,tiles,size,surf)
             points = self.getShadow(0,2,1,center,x+2,y-1,tiles,size,surf)
+            points = self.getShadow(0,2,1,center,x+3,y-1,tiles,size,surf)
         elif (dir == 1):
             pygame.draw.polygon(surf,(255,255,255),[[size,size],[size-width,0],[size+width,0]])
             points = self.getShadow(1,1,2,center,x+1,y-1,tiles,size,surf)
             points = self.getShadow(1,1,2,center,x+1,y-2,tiles,size,surf)
+            points = self.getShadow(1,1,2,center,x+1,y-3,tiles,size,surf)
             points = self.getShadow(1,2,2,center,x,y-1,tiles,size,surf)
             points = self.getShadow(1,2,2,center,x,y-2,tiles,size,surf)
+            points = self.getShadow(1,2,2,center,x,y-3,tiles,size,surf)
             points = self.getShadow(1,2,1,center,x-1,y-1,tiles,size,surf)
             points = self.getShadow(1,2,1,center,x-1,y-2,tiles,size,surf)
+            points = self.getShadow(1,2,1,center,x-1,y-3,tiles,size,surf)
         elif (dir == 2):
             pygame.draw.polygon(surf,(255,255,255),[[size,size],[0,size-width],[0,size+width]])
             points = self.getShadow(2,1,2,center,x-1,y+1,tiles,size,surf)
             points = self.getShadow(2,1,2,center,x-2,y+1,tiles,size,surf)
+            points = self.getShadow(2,1,2,center,x-3,y+1,tiles,size,surf)
             points = self.getShadow(2,2,2,center,x-1,y,tiles,size,surf)
             points = self.getShadow(2,2,2,center,x-2,y,tiles,size,surf)
+            points = self.getShadow(2,2,2,center,x-3,y,tiles,size,surf)
             points = self.getShadow(2,2,1,center,x-1,y-1,tiles,size,surf)
             points = self.getShadow(2,2,1,center,x-2,y-1,tiles,size,surf)
+            points = self.getShadow(2,2,1,center,x-3,y-1,tiles,size,surf)
         elif (dir == 3):
             pygame.draw.polygon(surf,(255,255,255),[[size,size],[size-width,size+size],[size+width,size+size]])
             points = self.getShadow(3,1,2,center,x+1,y+1,tiles,size,surf)
             points = self.getShadow(3,1,2,center,x+1,y+2,tiles,size,surf)
+            points = self.getShadow(3,1,2,center,x+1,y+3,tiles,size,surf)
             points = self.getShadow(3,2,2,center,x,y+1,tiles,size,surf)
             points = self.getShadow(3,2,2,center,x,y+2,tiles,size,surf)
+            points = self.getShadow(3,2,2,center,x,y+3,tiles,size,surf)
             points = self.getShadow(3,2,1,center,x-1,y+1,tiles,size,surf)
             points = self.getShadow(3,2,1,center,x-1,y+2,tiles,size,surf)
+            points = self.getShadow(3,2,1,center,x-1,y+3,tiles,size,surf)
             
         surf.set_colorkey((0,0,0))
         surf.set_alpha(100)
@@ -186,7 +198,7 @@ class Enemy():
         return pygame.mask.from_surface(surf,50)
         
     def getShadow(self,dir,a,b,center,x,y,tiles,size,surf):
-        if (x > len(tiles[0]) or y > len(tiles) or checkCollidable(tiles[y][x])==0 or x*32 == center[0] or y*32 == center[1]):
+        if (x >= len(tiles[0]) or y >= len(tiles) or checkCollidable(tiles[y][x])==0 or x*32 == center[0] or y*32 == center[1]):
             return 0
         x = x*32-center[0]
         y = y*32-center[1]

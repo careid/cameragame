@@ -1,5 +1,6 @@
 import pygame
 import os
+import random
 
 class Player():
     def __init__(self,x,y):
@@ -73,14 +74,14 @@ class Enemy():
         self.viewWidth = 30
         self.viewLength = 75
         self.action = "walk"
-        #self.images = [[pygame.image.load("graphics\\enemy1right.png")],
-        #               [pygame.image.load("graphics\\enemy1back.png")],
-        #               [pygame.image.load("graphics\\enemy1left.png")],
-        #               [pygame.image.load("graphics\\enemy1front.png")]]
-        self.images = [[pygame.image.load("graphics\\enemy0.png"),pygame.image.load("graphics\\enemy1.png"),pygame.image.load("graphics\\enemy2.png"),pygame.image.load("graphics\\enemy3.png")],
-                       [pygame.image.load("graphics\\enemy0.png"),pygame.image.load("graphics\\enemy1.png"),pygame.image.load("graphics\\enemy2.png"),pygame.image.load("graphics\\enemy3.png")],
-                       [pygame.image.load("graphics\\enemy0.png"),pygame.image.load("graphics\\enemy1.png"),pygame.image.load("graphics\\enemy2.png"),pygame.image.load("graphics\\enemy3.png")],
-                       [pygame.image.load("graphics\\enemy0.png"),pygame.image.load("graphics\\enemy1.png"),pygame.image.load("graphics\\enemy2.png"),pygame.image.load("graphics\\enemy3.png")]]
+        self.images = [[pygame.image.load("graphics\\enemy1right.png")],
+                       [pygame.image.load("graphics\\enemy1back.png")],
+                       [pygame.image.load("graphics\\enemy1left.png")],
+                       [pygame.image.load("graphics\\enemy1front.png")]]
+        #self.images = [[pygame.image.load("graphics\\enemy0.png"),pygame.image.load("graphics\\enemy1.png"),pygame.image.load("graphics\\enemy2.png"),pygame.image.load("graphics\\enemy3.png")],
+        #               [pygame.image.load("graphics\\enemy0.png"),pygame.image.load("graphics\\enemy1.png"),pygame.image.load("graphics\\enemy2.png"),pygame.image.load("graphics\\enemy3.png")],
+        #               [pygame.image.load("graphics\\enemy0.png"),pygame.image.load("graphics\\enemy1.png"),pygame.image.load("graphics\\enemy2.png"),pygame.image.load("graphics\\enemy3.png")],
+        #               [pygame.image.load("graphics\\enemy0.png"),pygame.image.load("graphics\\enemy1.png"),pygame.image.load("graphics\\enemy2.png"),pygame.image.load("graphics\\enemy3.png")]]
         self.dir = 0
     def update(self):
         tempIndex = self.pathIndex+1
@@ -120,7 +121,7 @@ class Enemy():
                 self.frame = 0
         elif (self.action == "walk"):
             self.frame += 0.3
-            if self.frame > 3:
+            if self.frame > 0:
                 self.frame = 0
     def play(self,action):
         if (self.action == action):
@@ -319,6 +320,8 @@ class Camera():
         self.y = y
         self.active = 0
         self.scale = scale
+        self.white = 0
+        self.maxWhite = 100
 
 class Game():
     def __init__(self):
@@ -339,19 +342,27 @@ class Game():
         while(os.path.exists("graphics\\tile"+str(i)+".png")):
             self.tileImages.append(pygame.image.load("graphics\\tile"+str(i)+".png"))
             i+=1
+        self.wallTiles = []
+        for i in range(0,10):
+            self.wallTiles.append(pygame.Surface((32,32)))
+            self.wallTiles[i].fill((30+i,30+i,30+i))
+        self.floorTiles = []
+        for i in range(0,10):
+            self.floorTiles.append(pygame.Surface((32,32)))
+            self.floorTiles[i].fill((100+i,100+i,100+i))
         pygame.mixer.music.load("The start.mp3")
         pygame.mixer.music.play(-1)
         #self.tileImages = [greenTile,blueTile]
 
     def restart(self,level):
         if level == 2: #level0
-            self.tiles = [[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-                          [0,1,1,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
-                          [0,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
-                          [0,1,1,0,0,1,1,1,0,0,0,0,0,1,1,1,1,1,1,1,1,1,0],
-                          [0,1,1,1,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
-                          [0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
-                          [0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
+            self.tiles = [[20,20,20,20,20,20,20,20,20,20,20,0,0,0,0,0,0,0,0,0,0,0,0],
+                          [20,21,21,20,20,20,20,21,21,21,21,1,1,1,1,1,1,1,1,1,1,1,0],
+                          [20,21,21,20,20,21,21,21,21,21,21,1,1,1,1,1,1,1,1,1,1,1,0],
+                          [20,21,21,20,20,21,21,21,20,20,20,0,0,1,1,1,1,1,1,1,1,1,0],
+                          [20,21,21,21,21,21,21,20,20,21,21,1,1,1,1,1,1,1,1,1,1,1,0],
+                          [20,20,20,20,20,20,20,20,20,21,21,1,1,1,1,1,1,1,1,1,1,1,0],
+                          [20,20,20,20,20,20,20,20,20,21,21,1,1,1,1,1,1,1,1,1,1,1,0],
                           [0,0,0,0,0,0,0,0,0,1,1,0,0,0,1,1,1,1,1,1,1,1,0],
                           [0,1,1,1,1,1,1,1,1,1,1,0,0,0,1,1,1,1,1,1,1,1,0],
                           [0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
@@ -572,14 +583,20 @@ class Game():
                         inRange = 1
                         e.playerView = 1
                 
-            
             for y in range(len(self.tiles)):
                 for x in range(len(self.tiles[y])):
                     if (checkCollidable(self.tiles[y][x])==1):
                         if (int(float(self.player.x)/32+0.5) == x and int(float(self.player.y)/32+0.5) == y):
                             self.player.x = oldPlayerLoc[0]
                             self.player.y = oldPlayerLoc[1]
-                    self.world.blit(self.tileImages[self.tiles[y][x]],(self.tileSize*x,self.tileSize*y))
+                    if (self.tiles[y][x]==1):
+                        img = self.floorTiles[random.randrange(0,len(self.floorTiles))]
+                        self.world.blit(img,(self.tileSize*x,self.tileSize*y))
+                    elif (self.tiles[y][x]==0):
+                        img = self.wallTiles[random.randrange(0,len(self.wallTiles))]
+                        self.world.blit(img,(self.tileSize*x,self.tileSize*y))
+                    else:
+                        self.world.blit(self.tileImages[self.tiles[y][x]],(self.tileSize*x,self.tileSize*y))
             self.player.draw(self.world)
             for e in self.enemies:
                 e.draw(self.world)
@@ -602,6 +619,20 @@ class Game():
                         img.blit(self.world,(0,0),c.view)
                         img = pygame.transform.scale(img,(c.view.width*c.scale,c.view.height*c.scale))
                         self.screen.blit(img,(c.x,c.y))
+                        if (c.white < c.maxWhite):
+                            c.white+=3
+                else:
+                    if (c.white > 0):
+                        c.white-=2
+                if (c.white > 0):
+                    white = pygame.Surface((c.view.width*c.scale,c.view.height*c.scale))
+                    if (c.active==0):
+                        white.fill((50,50,50))
+                        white.set_alpha(c.white)
+                    else:
+                        white.fill((255,255,255))
+                        white.set_alpha(c.maxWhite-c.white)
+                    self.screen.blit(white,(c.x,c.y))
 
             #check for end condition
             if (self.player.health < 0):
@@ -611,7 +642,7 @@ class Game():
             pygame.display.flip()
 
 def checkCollidable(num):
-    if num==0:
+    if num==0 or num==20:
         return 1
     else:
         return 0
